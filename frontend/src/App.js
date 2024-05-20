@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -11,11 +11,28 @@ import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import MyRentals from "./pages/MyRentals";
+import { setToken, getToken, removeToken } from "./utils/auth";
 import "./App.css";
 
 const App = () => {
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      axios
+        .get("http://localhost:3002/api/me", {
+          headers: { "x-access-token": token },
+        })
+        .then((response) => {
+          setUser(response.data);
+        })
+        .catch(() => {
+          removeToken();
+        });
+    }
+  }, []);
 
   const handleSignIn = async (identifier, password) => {
     try {
@@ -23,6 +40,7 @@ const App = () => {
         identifier,
         password,
       });
+      setToken(response.data.token);
       setUser(response.data.user);
       return true;
     } catch (error) {
@@ -39,7 +57,8 @@ const App = () => {
         password,
         type,
       });
-      setUser(response.data);
+      setToken(response.data.token);
+      setUser(response.data.user);
       return true;
     } catch (error) {
       console.error("Sign-up error:", error);
@@ -71,10 +90,13 @@ const App = () => {
           </nav>
         </header>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home user={user} token={getToken()} />} />
           <Route path="/sign-in" element={<SignIn onSignIn={handleSignIn} />} />
           <Route path="/sign-up" element={<SignUp onSignUp={handleSignUp} />} />
-          <Route path="/my-rentals" element={<MyRentals user={user} />} />
+          <Route
+            path="/my-rentals"
+            element={<MyRentals user={user} token={getToken()} />}
+          />
         </Routes>
       </div>
     </Router>
@@ -86,6 +108,7 @@ const UserMenu = ({ user, dropdownOpen, setDropdownOpen, setUser }) => {
 
   const handleDisconnect = () => {
     setUser(null);
+    removeToken();
     setDropdownOpen(false);
     navigate("/");
   };

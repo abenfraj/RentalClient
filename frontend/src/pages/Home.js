@@ -3,10 +3,9 @@ import axios from "axios";
 import { format } from "date-fns";
 import "./Home.css";
 
-const Home = () => {
+const Home = ({ token, user }) => {
   const [rentals, setRentals] = useState([]);
   const [filteredRentals, setFilteredRentals] = useState([]);
-  const [userType] = useState("tenant"); // Simule l'ID de l'utilisateur
   const [filters, setFilters] = useState({
     availability: "",
     type: "",
@@ -73,23 +72,18 @@ const Home = () => {
     applyFilters();
   }, [filters, rentals]);
 
-  const handleRent = async (rental) => {
+  const handleRequestRental = async (rental) => {
     try {
-      const tenantId = "user123"; // Simule l'ID de l'utilisateur
       const response = await axios.put(
-        `http://localhost:3001/api/rentals/${rental._id}`,
-        {
-          userId: rental.userId,
-          startDate: rental.startDate,
-          endDate: rental.endDate,
-          tenantId,
-        }
+        `http://localhost:3001/api/rentals/request/${rental._id}`,
+        { tenantId: user._id },
+        { headers: { "x-access-token": token } }
       );
       setRentals(
         rentals.map((r) => (r._id === rental._id ? response.data : r))
       );
     } catch (error) {
-      console.error("Error updating rental:", error);
+      console.error("Error requesting rental:", error);
     }
   };
 
@@ -147,7 +141,13 @@ const Home = () => {
       <div className="cards-container">
         {filteredRentals.map((rental) => (
           <div
-            className={`card ${rental.tenantId ? "rented" : ""}`}
+            className={`card ${
+              rental.tenantId
+                ? rental.process === "Requested"
+                  ? "requested"
+                  : "rented"
+                : ""
+            }`}
             key={rental._id}
           >
             <p>
@@ -170,10 +170,15 @@ const Home = () => {
               {rental.endDate ? format(new Date(rental.endDate), "PPP") : "N/A"}
             </p>
             {rental.tenantId ? (
-              <p className="rented-label">Already rented</p>
+              rental.process === "Requested" ? (
+                <p className="requested-label">Already requested</p>
+              ) : (
+                <p className="rented-label">Already rented</p>
+              )
             ) : (
-              userType === "tenant" && (
-                <button onClick={() => handleRent(rental)}>
+              user &&
+              user.type === "tenant" && (
+                <button onClick={() => handleRequestRental(rental)}>
                   Rent this apartment
                 </button>
               )

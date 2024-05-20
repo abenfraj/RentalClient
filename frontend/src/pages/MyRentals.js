@@ -5,7 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import "./MyRentals.css";
 
-const MyRentals = ({ user }) => {
+const MyRentals = ({ user, token }) => {
   const [rentals, setRentals] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [newRental, setNewRental] = useState({
@@ -27,8 +27,10 @@ const MyRentals = ({ user }) => {
           const endpoint =
             user.type === "tenant"
               ? `http://localhost:3001/api/rentals?tenantId=${user._id}`
-              : `http://localhost:3001/api/rentals?ownerId=${user._id}`;
-          const response = await axios.get(endpoint);
+              : `http://localhost:3001/api/rentals?userId=${user._id}`;
+          const response = await axios.get(endpoint, {
+            headers: { "x-access-token": token },
+          });
           setRentals(response.data);
         } catch (error) {
           console.error("Error fetching rentals:", error);
@@ -38,7 +40,7 @@ const MyRentals = ({ user }) => {
       };
       fetchRentals();
     }
-  }, [user]);
+  }, [user, token]);
 
   const handleInputChange = (e) => {
     setNewRental({ ...newRental, [e.target.name]: e.target.value });
@@ -52,10 +54,16 @@ const MyRentals = ({ user }) => {
   const handleAddRental = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3001/api/rentals", {
-        ...newRental,
-        userId: user._id,
-      });
+      const response = await axios.post(
+        "http://localhost:3001/api/rentals",
+        {
+          ...newRental,
+          userId: user._id,
+        },
+        {
+          headers: { "x-access-token": token },
+        }
+      );
       setRentals([...rentals, response.data]);
       setShowForm(false);
     } catch (error) {
@@ -65,11 +73,49 @@ const MyRentals = ({ user }) => {
 
   const handleDeleteRental = async (rentalId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/rentals/${rentalId}`);
+      await axios.delete(`http://localhost:3001/api/rentals/${rentalId}`, {
+        headers: { "x-access-token": token },
+      });
       setRentals(rentals.filter((rental) => rental._id !== rentalId));
       setDeleteRentalId(null);
     } catch (error) {
       console.error("Error deleting rental:", error);
+    }
+  };
+
+  const handleAcceptRental = async (rentalId) => {
+    try {
+      await axios.put(
+        `http://localhost:3001/api/rentals/accept/${rentalId}`,
+        {},
+        { headers: { "x-access-token": token } }
+      );
+      setRentals(
+        rentals.map((rental) =>
+          rental._id === rentalId ? { ...rental, process: "Rented" } : rental
+        )
+      );
+    } catch (error) {
+      console.error("Error accepting rental:", error);
+    }
+  };
+
+  const handleRejectRental = async (rentalId) => {
+    try {
+      await axios.put(
+        `http://localhost:3001/api/rentals/reject/${rentalId}`,
+        {},
+        { headers: { "x-access-token": token } }
+      );
+      setRentals(
+        rentals.map((rental) =>
+          rental._id === rentalId
+            ? { ...rental, tenantId: null, process: null }
+            : rental
+        )
+      );
+    } catch (error) {
+      console.error("Error rejecting rental:", error);
     }
   };
 
@@ -137,7 +183,13 @@ const MyRentals = ({ user }) => {
       <div className="cards-container">
         {rentals.map((rental) => (
           <div
-            className={`card ${rental.tenantId ? "rented" : ""}`}
+            className={`card ${
+              rental.tenantId
+                ? rental.process === "Requested"
+                  ? "requested"
+                  : "rented"
+                : ""
+            }`}
             key={rental._id}
           >
             <p>
@@ -159,8 +211,25 @@ const MyRentals = ({ user }) => {
               <strong>End Date:</strong>{" "}
               {rental.endDate ? format(new Date(rental.endDate), "PPP") : "N/A"}
             </p>
-            {rental.tenantId && <p className="rented-label">Already rented</p>}
-            {user.type === "owner" && (
+            {rental.tenantId && rental.process === "Requested" && (
+              <>
+                {user.type === "owner" && (
+                  <>
+                    <button onClick={() => handleAcceptRental(rental._id)}>
+                      Accept
+                    </button>
+                    <button onClick={() => handleRejectRental(rental._id)}>
+                      Reject
+                    </button>
+                  </>
+                )}
+                <p className="requested-label">Requested</p>
+              </>
+            )}
+            {rental.tenantId && rental.process === "Rented" && (
+              <p className="rented-label">Already rented</p>
+            )}
+            {!rental.tenantId && user.type === "owner" && (
               <button
                 className="delete-rental-btn"
                 onClick={() => setDeleteRentalId(rental._id)}

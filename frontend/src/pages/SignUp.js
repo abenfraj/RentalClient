@@ -5,7 +5,7 @@ const SignUp = ({ onSignUp }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // Added confirm password state
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [type, setType] = useState("tenant");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -52,8 +52,7 @@ const SignUp = ({ onSignUp }) => {
             />
           </div>
           <div>
-            <label>Confirm Password:</label>{" "}
-            {/* Added confirm password field */}
+            <label>Confirm Password:</label>
             <input
               type="password"
               value={confirmPassword}

@@ -1,3 +1,5 @@
+/* Home.css */
+
 .home {
     padding: 20px;
 }
@@ -67,11 +69,32 @@ h1 {
     position: relative;
 }
 
+.card.requested {
+    background-color: #d7f8ff;
+    position: relative;
+}
+
 .rented-label {
     color: red;
     font-weight: bold;
     font-size: 20px;
     border: 2px solid red;
+    padding: 8px;
+    transform: rotate(-25deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-25deg);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.requested-label {
+    color: blue;
+    font-weight: bold;
+    font-size: 20px;
+    border: 2px solid blue;
     padding: 8px;
     transform: rotate(-25deg);
     position: absolute;
