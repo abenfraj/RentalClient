@@ -1,3 +1,36 @@
+.home {
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filter-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-bar select,
+.filter-bar input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+}
+
 .card {
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -7,6 +40,7 @@
     background-color: #fff;
     width: 300px;
     transition: transform 0.2s;
+    position: relative;
 }
 
 .card:hover {
@@ -17,10 +51,24 @@
     margin: 8px 0;
 }
 
-.cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-    padding: 16px;
+.card.rented {
+    background-color: #f8d7da;
+    text-decoration: line-through;
+    position: relative;
+}
+
+.rented-label {
+    color: red;
+    font-weight: bold;
+    font-size: 20px;
+    border: 2px solid red;
+    padding: 8px;
+    transform: rotate(-25deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-25deg);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }

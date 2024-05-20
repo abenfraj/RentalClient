@@ -1,60 +1,121 @@
+/* Container for the My Rentals page */
 .my-rentals {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
 }
 
+/* Title styling */
 .my-rentals h2 {
+    font-size: 32px;
+    font-weight: bold;
     margin-bottom: 20px;
+    text-align: center;
+    color: #333;
 }
 
+/* Button to add rental */
 .add-rental-btn {
-    padding: 10px 20px;
-    background-color: #282c34;
-    color: white;
+    background-color: #007bff;
+    color: #fff;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    padding: 10px 20px;
     margin-bottom: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 .add-rental-btn:hover {
-    background-color: #3a3f47;
+    background-color: #0056b3;
 }
 
+/* Form styling */
 .rental-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     margin-bottom: 20px;
+    width: 100%;
+    max-width: 500px;
 }
 
-.rental-form input {
+.rental-form input,
+.rental-form select,
+.rental-form button {
+    margin-bottom: 10px;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    width: 100%;
+    font-size: 16px;
 }
 
 .rental-form button {
-    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
     border: none;
-    border-radius: 4px;
-    background-color: #282c34;
-    color: white;
+    border-radius: 5px;
     cursor: pointer;
 }
 
-.rental-form button:hover {
-    background-color: #3a3f47;
+.rental-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
-.my-rentals ul {
-    list-style: none;
-    padding: 0;
+/* Card container */
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
 }
 
-.my-rentals li {
+/* Card styling */
+.card {
     border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    width: 300px;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card p {
+    margin: 8px 0;
+}
+
+.card.rented {
+    background-color: #f8d7da;
+    text-decoration: line-through;
+    position: relative;
+}
+
+/* Rented label styling */
+.rented-label {
+    color: red;
+    font-weight: bold;
+    font-size: 20px;
+    border: 2px solid red;
+    padding: 8px;
+    transform: rotate(-25deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-25deg);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
