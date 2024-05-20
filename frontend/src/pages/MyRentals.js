@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import "./MyRentals.css";
 
 const MyRentals = ({ user }) => {
@@ -13,6 +15,8 @@ const MyRentals = ({ user }) => {
     location: "",
     price: "",
   });
+  const [deleteRentalId, setDeleteRentalId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const rentalTypes = ["Apartment", "House", "Studio", "Loft"];
 
@@ -28,6 +32,8 @@ const MyRentals = ({ user }) => {
           setRentals(response.data);
         } catch (error) {
           console.error("Error fetching rentals:", error);
+        } finally {
+          setLoading(false);
         }
       };
       fetchRentals();
@@ -57,8 +63,18 @@ const MyRentals = ({ user }) => {
     }
   };
 
-  if (!user) {
-    return <div>Loading...</div>; // or handle the error as you need
+  const handleDeleteRental = async (rentalId) => {
+    try {
+      await axios.delete(`http://localhost:3001/api/rentals/${rentalId}`);
+      setRentals(rentals.filter((rental) => rental._id !== rentalId));
+      setDeleteRentalId(null);
+    } catch (error) {
+      console.error("Error deleting rental:", error);
+    }
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
   }
 
   return (
@@ -144,9 +160,23 @@ const MyRentals = ({ user }) => {
               {rental.endDate ? format(new Date(rental.endDate), "PPP") : "N/A"}
             </p>
             {rental.tenantId && <p className="rented-label">Already rented</p>}
+            {user.type === "owner" && (
+              <button
+                className="delete-rental-btn"
+                onClick={() => setDeleteRentalId(rental._id)}
+              >
+                Delete Rental
+              </button>
+            )}
           </div>
         ))}
       </div>
+      {deleteRentalId && (
+        <ConfirmDeleteModal
+          onConfirm={() => handleDeleteRental(deleteRentalId)}
+          onCancel={() => setDeleteRentalId(null)}
+        />
+      )}
     </div>
   );
 };

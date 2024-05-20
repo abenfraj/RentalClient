@@ -23,6 +23,16 @@ h1 {
     border-radius: 4px;
 }
 
+.filter-bar label {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.filter-bar input[type="checkbox"] {
+    margin-right: 5px;
+}
+
 .cards-container {
     display: flex;
     flex-wrap: wrap;

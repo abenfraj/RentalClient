@@ -6,13 +6,14 @@ import "./Home.css";
 const Home = () => {
   const [rentals, setRentals] = useState([]);
   const [filteredRentals, setFilteredRentals] = useState([]);
-  const [userType] = useState("tenant"); // Simule le type d'utilisateur
+  const [userType] = useState("tenant"); // Simule l'ID de l'utilisateur
   const [filters, setFilters] = useState({
     availability: "",
     type: "",
     location: "",
     minPrice: "",
     maxPrice: "",
+    showAvailableOnly: false,
   });
 
   useEffect(() => {
@@ -29,19 +30,19 @@ const Home = () => {
   }, []);
 
   const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFilters({
+      ...filters,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
   useEffect(() => {
     const applyFilters = () => {
       let filtered = rentals;
 
-      if (filters.availability) {
-        filtered = filtered.filter((rental) =>
-          filters.availability === "available"
-            ? !rental.tenantId
-            : rental.tenantId
-        );
+      if (filters.showAvailableOnly) {
+        filtered = filtered.filter((rental) => !rental.tenantId);
       }
 
       if (filters.type) {
@@ -74,7 +75,7 @@ const Home = () => {
 
   const handleRent = async (rental) => {
     try {
-      const tenantId = "user123"; // Simule l'ID du tenant
+      const tenantId = "user123"; // Simule l'ID de l'utilisateur
       const response = await axios.put(
         `http://localhost:3001/api/rentals/${rental._id}`,
         {
@@ -133,6 +134,15 @@ const Home = () => {
           value={filters.maxPrice}
           onChange={handleFilterChange}
         />
+        <label>
+          <input
+            type="checkbox"
+            name="showAvailableOnly"
+            checked={filters.showAvailableOnly}
+            onChange={handleFilterChange}
+          />
+          Show Available Only
+        </label>
       </div>
       <div className="cards-container">
         {filteredRentals.map((rental) => (
